@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LinkContainer } from "react-router-bootstrap";
 import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap";
-import { logout, getUserDetails } from "../actions/userActions";
+import { logout } from "../actions/userActions";
 
 const Header = () => {
     const [name, setName] = useState("");
@@ -14,16 +14,13 @@ const Header = () => {
     const { user } = useSelector((state) => state.userDetails);
 
     useEffect(() => {
-        if (!user) {
-            dispatch(getUserDetails("profile"));
-        } else {
-            setName(user.name);
+        if (userInfo) {
+            if (user.name) setName(user.name);
+            else setName(userInfo.name);
         }
-    }, [setName, user, dispatch]);
+    }, [setName, user, userInfo]);
 
-    const logoutHandler = () => {
-        dispatch(logout());
-    };
+    const logoutHandler = () => dispatch(logout());
 
     return (
         <header>

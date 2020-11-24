@@ -10,7 +10,7 @@ import Loader from "../components/Loader";
 import { getOrderDetails, payOrder } from "../actions/orderActions";
 import { ORDER_PAY_RESET } from "../constants/orderConstants";
 
-const OrderScreen = ({ match }) => {
+const OrderScreen = ({ match, history }) => {
     const orderId = match.params.id;
 
     const [sdkReady, setSdkReady] = useState(false);
@@ -20,6 +20,8 @@ const OrderScreen = ({ match }) => {
     const { order, loading, error } = useSelector(
         (state) => state.orderDetails
     );
+
+    const { userInfo } = useSelector((state) => state.userLogin);
 
     const { loading: loadingPay, success: successPay } = useSelector(
         (state) => state.orderPay
@@ -46,23 +48,28 @@ const OrderScreen = ({ match }) => {
     );
 
     useEffect(() => {
-        const addPayPalScript = async () => {
-            const { data: clientId } = await axios.get("/api/config/paypal");
-            const script = document.createElement("script");
-            script.type = "text/javascript";
-            script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`;
-            script.async = true;
-            script.onload = () => setSdkReady(true);
+        if (!userInfo) history.push("/login");
+        else {
+            const addPayPalScript = async () => {
+                const { data: clientId } = await axios.get(
+                    "/api/config/paypal"
+                );
+                const script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`;
+                script.async = true;
+                script.onload = () => setSdkReady(true);
 
-            document.body.appendChild(script);
-        };
+                document.body.appendChild(script);
+            };
 
-        if (!order || id !== orderId || successPay) {
-            dispatch({ type: ORDER_PAY_RESET });
-            dispatch(getOrderDetails(orderId));
-        } else if (!isPaid) {
-            if (!window.paypal) addPayPalScript();
-            else setSdkReady(true);
+            if (!order || id !== orderId || successPay) {
+                dispatch({ type: ORDER_PAY_RESET });
+                dispatch(getOrderDetails(orderId));
+            } else if (!isPaid) {
+                if (!window.paypal) addPayPalScript();
+                else setSdkReady(true);
+            }
         }
     }, [dispatch, orderId, order, successPay]);
 
