@@ -22,7 +22,7 @@ const ProfileScreen = ({ history }) => {
     const { loading, error, user } = useSelector((state) => state.userDetails);
 
     const { loading: loadingOrders, error: errorOrders, orders } = useSelector(
-        (state) => state.orderList
+        (state) => state.orderListMy
     );
 
     const { success } = useSelector((state) => state.userUpdateProfile);
