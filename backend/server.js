@@ -1,7 +1,7 @@
 const express = require("express");
-const app = express();
 const path = require("path");
 const dotenv = require("dotenv");
+const morgan = require("morgan");
 const connectDB = require("./config/db");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 require("colors");
@@ -14,6 +14,10 @@ const uploadRoutes = require("./routes/uploadRoutes");
 dotenv.config();
 
 connectDB();
+
+const app = express();
+
+if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
     res.send("API is running");
